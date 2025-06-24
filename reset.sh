@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # reset.sh
+# This script helps reset the current Git working directory and optionally modifies main.py.
 
 # Check if exactly one argument is provided
 if [ "$#" -ne 1 ]; then
@@ -33,10 +34,13 @@ if [ "$ARGUMENT" == "orange" ]; then
     # Check if main.py exists
     if [ -f "main.py" ]; then
         # Use sed to replace "ORANGE_BARREL" with "BLUE_BARREL" on lines 159 and 175.
-        # The -i option edits the file in place.
+        # The -i option edits the file in place. On macOS (BSD sed), -i requires an argument
+        # for the backup file extension (e.g., -i.bak). Using -i '' provides an empty extension,
+        # which makes it compatible with both GNU sed (Linux) and BSD sed (macOS) for in-place editing
+        # without creating a backup file.
         # 's/old_string/new_string/' is the substitution command.
-        sed -i '159s/ORANGE_BARREL/BLUE_BARREL/' main.py
-        sed -i '175s/ORANGE_BARREL/BLUE_BARREL/' main.py
+        sed -i '' '159s/ORANGE_BARREL/BLUE_BARREL/' main.py
+        sed -i '' '175s/ORANGE_BARREL/BLUE_BARREL/' main.py
 
         if [ $? -eq 0 ]; then
             echo "Successfully replaced 'ORANGE_BARREL' with 'BLUE_BARREL' on lines 159 and 175 of main.py."
