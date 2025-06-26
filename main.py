@@ -91,6 +91,7 @@ DEFAULT_SPEED = 100
 PRECISION_MOVE_VELOCITY = 50
 PRECISION_TURN_VELOCITY = 25 # Used for aligning with goal
 SCAN_TURN_VELOCITY = 30      # New constant for ball scanning turns
+SCAN_RANDOM_MOVE_MM = 20     # Distance to move after a full scan
 
 # Vision and Behavior Constants
 GOAL_HEIGHT_THRESHOLD = 30  # Minimum height of goal barrel to consider close enough
@@ -140,6 +141,11 @@ def align_with_goal():
     max_turns = 100  # Prevent infinite loop
     turn_count = 0
     while turn_count < max_turns:
+        # Check if we still have the ball at the start of each turn
+        if not robot.has_sports_ball():
+            print("Dropped the ball while aligning with goal!")
+            return False
+
         vision_data = robot.vision.get_data(ORANGE_BARREL)
         if vision_data and vision_data[0].exists:
             robot.turn_to(robot.inertial.get_heading() + vision_data[0].bearing)
@@ -199,6 +205,10 @@ while True:
         # Since look_for_ball() is now non-blocking, we call it directly.
 
         robot.screen.show_emoji(THINKING)
+
+        # Get the robot's rotation at the start of the scan
+        start_scan_rotation = robot.inertial.get_rotation()
+
         ball_found = False
         while True:
             if crashed:
@@ -223,6 +233,22 @@ while True:
                 status = RobotStatus.GETTING_BALL
                 ball_found = True
                 break
+
+            # After checking for the ball, see if we need to move
+            if abs(robot.inertial.get_rotation() - start_scan_rotation) >= 360:
+                print("Completed a full 360 scan, moving to a new spot.")
+                
+                # Choose a random direction: 0=fwd, 90=right, 180=back, 270=left
+                move_directions = [0, 90, 180, 270]
+                random_direction = random.choice(move_directions)
+                
+                # Move in that direction. This is a blocking call.
+                robot.move_at(random_direction, PRECISION_MOVE_VELOCITY)
+                wait(SCAN_MOVE_DURATION_SEC, SECONDS)
+                robot.stop_all_movement()
+                
+                # Reset the scan rotation tracker for the next 360-degree scan
+                start_scan_rotation = robot.inertial.get_rotation()
             
         if not ball_found and not crashed: # If loop broke for other reason
             status = RobotStatus.FINDING_BALL # Re-enter finding ball state
