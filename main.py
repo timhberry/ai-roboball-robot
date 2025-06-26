@@ -10,12 +10,9 @@ robot = Robot()
 # Timer initialization
 timer = Timer()
 
-# Controller initialization
-controller = Onestick()
-
 # AI Vision configuration code
 robot.vision.model_detection(True)
-robot.vision.tag_detection(True)
+robot.vision.tag_detection(False)
 
 # Console Colors
 def set_console_text_color(COLOR):
@@ -92,7 +89,8 @@ class RobotStatus:
 # Movement Constants
 DEFAULT_SPEED = 100
 PRECISION_MOVE_VELOCITY = 50
-PRECISION_TURN_VELOCITY = 25
+PRECISION_TURN_VELOCITY = 25 # Used for aligning with goal
+SCAN_TURN_VELOCITY = 30      # New constant for ball scanning turns
 
 # Vision and Behavior Constants
 GOAL_HEIGHT_THRESHOLD = 30  # Minimum height of goal barrel to consider close enough
@@ -116,37 +114,23 @@ def crashed_callback():
 robot.inertial.crashed(crashed_callback)
 robot.inertial.set_crash_sensitivity(NORMAL)
 
+# AI Vision Color detection for the ball
+BALLCOLOR = Colordesc(1, 206, 211, 138, 20, 0.3)
+robot.vision.color_description(BALLCOLOR)
+
 # Calibrate the robot and disable AprilTag sensing
 robot.inertial.calibrate()
-robot.vision.tag_detection(False)
-wait(2, SECONDS)
+if robot.inertial.is_calibrating():
+    print("Waiting for callibration to complete")
+    wait(2, SECONDS)
+
 
 def look_for_ball():
-    """Moves the robot left and right to scan for the ball."""
-    count = 0
-    # Move left and right on the field, so the AI camera can scan
-    # Assumes you start in the centre of the field
-    robot.move_with_vectors(DEFAULT_SPEED, 0, 0)
-    wait(1, SECONDS)
-    while True:
-        robot.move_with_vectors(-DEFAULT_SPEED, 0, 0)
-        wait(SCAN_MOVE_DURATION_SEC, SECONDS)
-        robot.move_with_vectors(DEFAULT_SPEED, 0, 0)
-        wait(SCAN_MOVE_DURATION_SEC, SECONDS)
-        count = count + 1
-        # After 5 moves back and forth, try something new
-        if count > SCAN_CYCLES_BEFORE_ACTION:
-            if random.randrange(2) == 1:
-                print("Haven't found it yet - moving forward a bit")
-                robot.move_with_vectors(0, DEFAULT_SPEED, 0)
-                wait(0.5, SECONDS)
-            else:
-                print("Haven't found it yet - turning around")
-                robot.turn(RIGHT)
-                wait(1, SECONDS)
-            count = 0
+    """Makes the robot rotate in place to scan for the ball."""
+    robot.turn(RIGHT, SCAN_TURN_VELOCITY) # Or LEFT, or alternate directions for a more thorough scan
+    wait(TURN_MOVE_DURATION_MSEC, MSEC) # Use a small duration for a quick turn
+    robot.stop_all_movement() # Stop after the turn
 
-# Main loop
 
 def align_with_goal():
     """Turns the robot to face the opponent's goal barrel."""
@@ -169,6 +153,7 @@ def align_with_goal():
     print("Warning: Goal not found after many turns.")
     return False
 
+
 def approach_goal():
     """Moves the robot closer to the goal until a certain height threshold is met."""
     while True:
@@ -184,6 +169,7 @@ def approach_goal():
             # Lost sight of the goal, stop approaching
             robot.stop_all_movement()
             return False
+
 
 def execute_kick():
     """Performs the kicking action and celebratory animations."""
@@ -204,31 +190,40 @@ def execute_kick():
     wait(1, SECONDS)
     robot.stop_all_movement()
 
+# Main loop
 while True:
-
-    print("Main loop")
 
     if status == RobotStatus.FINDING_BALL:
         # If we are finding the ball, we run the look_for_ball function in a thread
-        # and stop when we see the ball in our AI Vision camera
+        # and stop when we see the ball in our AI Vision camera.
+        # Since look_for_ball() is now non-blocking, we call it directly.
 
         robot.screen.show_emoji(THINKING)
-        look_for_ball_thread = Thread(look_for_ball)
-
         ball_found = False
         while True:
             if crashed:
-                look_for_ball_thread.stop()
                 status = RobotStatus.CRASHED
                 break
-            vision_data = robot.vision.get_data(SPORTS_BALL)
-            if vision_data and vision_data[0].exists:
-                # If we spot the ball, stop looking!
-                look_for_ball_thread.stop()
-                robot.turn_to(robot.inertial.get_heading() + vision_data[0].bearing)
+            look_for_ball() # Perform a small turn to scan
+
+            detected_ball_object = None
+
+            # Prioritize detection by custom color signature (BALLCOLOR)
+            vision_data_color = robot.vision.get_data(BALLCOLOR)
+            if vision_data_color: # Check if the tuple is not empty
+                detected_ball_object = vision_data_color[0]
+            # If not found by color, check by pre-trained SPORTS_BALL object type
+            elif not detected_ball_object: # Only check SPORTS_BALL if BALLCOLOR wasn't found
+                vision_data_sports_ball = robot.vision.get_data(SPORTS_BALL)
+                if vision_data_sports_ball: # Check if the tuple is not empty
+                    detected_ball_object = vision_data_sports_ball[0]
+
+            if detected_ball_object:
+                robot.turn_to(robot.inertial.get_heading() + detected_ball_object.bearing)
                 status = RobotStatus.GETTING_BALL
                 ball_found = True
                 break
+            
         if not ball_found and not crashed: # If loop broke for other reason
             status = RobotStatus.FINDING_BALL # Re-enter finding ball state
 
@@ -243,16 +238,27 @@ while True:
             if crashed:
                 status = RobotStatus.CRASHED
                 break
-            vision_data = robot.vision.get_data(SPORTS_BALL)
-            if vision_data and vision_data[0].exists:           # We can still see the ball
+
+            detected_ball_object = None
+            # Prioritize detection by custom color signature (BALLCOLOR)
+            vision_data_color = robot.vision.get_data(BALLCOLOR)
+            if vision_data_color: # Check if the tuple is not empty
+                detected_ball_object = vision_data_color[0]
+            # If not found by color, check by pre-trained SPORTS_BALL object type
+            elif not detected_ball_object: # Only check SPORTS_BALL if BALLCOLOR wasn't found
+                vision_data_sports_ball = robot.vision.get_data(SPORTS_BALL)
+                if vision_data_sports_ball: # Check if the tuple is not empty
+                    detected_ball_object = vision_data_sports_ball[0]
+
+            if detected_ball_object:                            # We can still see the ball
                 if robot.has_sports_ball():                     # Do we have it?
                     robot.stop_all_movement()                   # If so, break the While loop
                     ball_acquired = True
                     break
                 else:
-                    robot.move_at(vision_data[0].bearing)       # If not, move towards it
+                    robot.move_at(detected_ball_object.bearing) # If not, move towards it
                     wait(APPROACH_MOVE_DURATION_MSEC, MSEC)
-            else:                                               # We can't see the ball,
+            else:                                               # We can't see the ball
                 break                                           # so break the While loop
 
         if ball_acquired:                                       # Did we get it?
