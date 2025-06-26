@@ -43,7 +43,7 @@ if [ "$ARGUMENT" == "orange" ]; then
         sed -i '' '160s/ORANGE_BARREL/BLUE_BARREL/' main.py
 
         if [ $? -eq 0 ]; then
-            echo "Successfully replaced 'ORANGE_BARREL' with 'BLUE_BARREL' on lines 159 and 175 of main.py."
+            echo "Successfully replaced 'ORANGE_BARREL' with 'BLUE_BARREL' in main.py."
         else
             echo "Error: Failed to modify main.py. 'sed' command might have encountered an issue."
         fi
