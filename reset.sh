@@ -39,8 +39,8 @@ if [ "$ARGUMENT" == "orange" ]; then
         # which makes it compatible with both GNU sed (Linux) and BSD sed (macOS) for in-place editing
         # without creating a backup file.
         # 's/old_string/new_string/' is the substitution command.
-        sed -i '' '159s/ORANGE_BARREL/BLUE_BARREL/' main.py
-        sed -i '' '175s/ORANGE_BARREL/BLUE_BARREL/' main.py
+        sed -i '' '143s/ORANGE_BARREL/BLUE_BARREL/' main.py
+        sed -i '' '160s/ORANGE_BARREL/BLUE_BARREL/' main.py
 
         if [ $? -eq 0 ]; then
             echo "Successfully replaced 'ORANGE_BARREL' with 'BLUE_BARREL' on lines 159 and 175 of main.py."
