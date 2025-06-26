@@ -250,13 +250,13 @@ while True:
                 if vision_data_sports_ball: # Check if the tuple is not empty
                     detected_ball_object = vision_data_sports_ball[0]
 
-            if detected_ball_object:                            # We can still see the ball
+            if detected_ball_object:           # We can still see the ball
                 if robot.has_sports_ball():                     # Do we have it?
                     robot.stop_all_movement()                   # If so, break the While loop
                     ball_acquired = True
                     break
                 else:
-                    robot.move_at(detected_ball_object.bearing) # If not, move towards it
+                    robot.move_at(detected_ball_object.bearing)       # If not, move towards it
                     wait(APPROACH_MOVE_DURATION_MSEC, MSEC)
             else:                                               # We can't see the ball
                 break                                           # so break the While loop
@@ -277,9 +277,6 @@ while True:
             continue
 
         if align_with_goal():
-            if not robot.has_sports_ball():
-                status = RobotStatus.FINDING_BALL
-                continue
             if approach_goal():
                 if robot.has_sports_ball():
                     execute_kick()
