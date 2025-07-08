@@ -288,8 +288,10 @@ while True:
                 break                                           # so break the While loop
 
         if ball_acquired:                                       # Did we get it?
+            robot.stop_all_movement()                           # Stop before looking for the goal
             status = RobotStatus.FINDING_GOAL                   # Great, go find the goal
         else:
+            robot.stop_all_movement()                           # Stop before searching again
             status = RobotStatus.FINDING_BALL                   # We lost it, go back to playing
 
 
@@ -326,5 +328,6 @@ while True:
         wait(3, SECONDS) # Allow some time for robot to settle
         robot.turn(RIGHT)
         wait(1, SECONDS)
+        robot.stop_all_movement()
         crashed = False
         status = RobotStatus.FINDING_BALL
