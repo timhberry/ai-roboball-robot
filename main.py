@@ -44,11 +44,11 @@ def clear_console():
     print("\033[2J", end="")
 
 # User Uploaded Images
-IMAGE1 = "image1.png"
-IMAGE2 = "image2.png"
-IMAGE3 = "image3.png"
-IMAGE4 = "image4.png"
-IMAGE5 = "image5.png"
+IMG_AMAZED = "image1.png"
+IMG_THRILLED = "image2.png"
+IMG_DETERMINED = "image3.png"
+IMG_THINKING = "image4.png"
+IMG_STRESSED = "image5.png"
 IMAGE6 = "image6.png"
 IMAGE7 = "image7.png"
 IMAGE8 = "image8.png"
@@ -180,7 +180,7 @@ def approach_goal():
 def execute_kick():
     """Performs the kicking action and celebratory animations."""
     robot.kicker.kick(MEDIUM)
-    robot.screen.show_emoji(AMAZED)
+    robot.screen.show_file(IMG_AMAZED, 0, 0)
     robot.sound.play(ACT_HAPPY)
     for _ in range(3):
         robot.led.on(ALL_LEDS, YELLOW)
@@ -204,7 +204,7 @@ while True:
         # and stop when we see the ball in our AI Vision camera.
         # Since look_for_ball() is now non-blocking, we call it directly.
 
-        robot.screen.show_emoji(THINKING)
+        robot.screen.show_file(IMG_THINKING, 0, 0)
 
         # Get the robot's rotation at the start of the scan
         start_scan_rotation = robot.inertial.get_rotation()
@@ -257,7 +257,7 @@ while True:
     elif status == RobotStatus.GETTING_BALL:
         # If we've seen the ball, we now need to go get it!
 
-        robot.screen.show_emoji(THRILLED)
+        robot.screen.show_file(IMG_THRILLED, 0, 0)
 
         ball_acquired = False
         while True:
@@ -296,7 +296,7 @@ while True:
     elif status == RobotStatus.FINDING_GOAL:
         # We've got the ball, now we need to find the goal and attempt to score
 
-        robot.screen.show_emoji(DETERMINED)
+        robot.screen.show_file(IMG_DETERMINED, 0, 0)
 
         if not robot.has_sports_ball():
             status = RobotStatus.FINDING_BALL # We dropped the ball
@@ -320,7 +320,7 @@ while True:
         # We crashed! We may have hit another robot, or the edge of the field
         # We'll try turning around to see if that helps
 
-        robot.screen.show_emoji(STRESSED)
+        robot.screen.show_file(IMG_STRESSED, 0, 0)
         robot.sound.play(CRASH)
         robot.stop_all_movement()
         wait(3, SECONDS) # Allow some time for robot to settle
