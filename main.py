@@ -87,10 +87,10 @@ class RobotStatus:
     CRASHED = "crashed"
 
 # Movement Constants
-DEFAULT_SPEED = 100
-PRECISION_MOVE_VELOCITY = 50
-PRECISION_TURN_VELOCITY = 25 # Used for aligning with goal
-SCAN_TURN_VELOCITY = 30      # New constant for ball scanning turns
+DEFAULT_SPEED = 50
+PRECISION_MOVE_VELOCITY = 25
+PRECISION_TURN_VELOCITY = 20 # Used for aligning with goal
+SCAN_TURN_VELOCITY = 20      # New constant for ball scanning turns
 SCAN_RANDOM_MOVE_MM = 20     # Distance to move after a full scan
 
 # Vision and Behavior Constants
