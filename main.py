@@ -146,7 +146,7 @@ def align_with_goal():
             print("Dropped the ball while aligning with goal!")
             return False
 
-        vision_data = robot.vision.get_data(ORANGE_BARREL)
+        vision_data = robot.vision.get_data(BLUE_BARREL)
         if vision_data and vision_data[0].exists:
             robot.turn_to(robot.inertial.get_heading() + vision_data[0].bearing)
             robot.stop_all_movement()
@@ -163,7 +163,7 @@ def align_with_goal():
 def approach_goal():
     """Moves the robot closer to the goal until a certain height threshold is met."""
     while True:
-        vision_data = robot.vision.get_data(ORANGE_BARREL)
+        vision_data = robot.vision.get_data(BLUE_BARREL)
         if vision_data and vision_data[0].exists:
             goal_height = vision_data[0].height
             if goal_height >= GOAL_HEIGHT_THRESHOLD:
@@ -219,14 +219,14 @@ while True:
             detected_ball_object = None
 
             # Prioritize detection by custom color signature (BALLCOLOR)
-            vision_data_color = robot.vision.get_data(BALLCOLOR)
-            if vision_data_color: # Check if the tuple is not empty
-                detected_ball_object = vision_data_color[0]
+            #vision_data_color = robot.vision.get_data(BALLCOLOR)
+            #if vision_data_color: # Check if the tuple is not empty
             # If not found by color, check by pre-trained SPORTS_BALL object type
-            elif not detected_ball_object: # Only check SPORTS_BALL if BALLCOLOR wasn't found
-                vision_data_sports_ball = robot.vision.get_data(SPORTS_BALL)
-                if vision_data_sports_ball: # Check if the tuple is not empty
-                    detected_ball_object = vision_data_sports_ball[0]
+            ##    detected_ball_object = vision_data_color[0]
+            #elif not detected_ball_object: # Only check SPORTS_BALL if BALLCOLOR wasn't found
+            vision_data_sports_ball = robot.vision.get_data(SPORTS_BALL)
+            if vision_data_sports_ball: # Check if the tuple is not empty
+                detected_ball_object = vision_data_sports_ball[0]
 
             if detected_ball_object:
                 robot.turn_to(robot.inertial.get_heading() + detected_ball_object.bearing)
@@ -267,14 +267,14 @@ while True:
 
             detected_ball_object = None
             # Prioritize detection by custom color signature (BALLCOLOR)
-            vision_data_color = robot.vision.get_data(BALLCOLOR)
-            if vision_data_color: # Check if the tuple is not empty
-                detected_ball_object = vision_data_color[0]
+            #vision_data_color = robot.vision.get_data(BALLCOLOR)
+            #if vision_data_color: # Check if the tuple is not empty
+            #    detected_ball_object = vision_data_color[0]
             # If not found by color, check by pre-trained SPORTS_BALL object type
-            elif not detected_ball_object: # Only check SPORTS_BALL if BALLCOLOR wasn't found
-                vision_data_sports_ball = robot.vision.get_data(SPORTS_BALL)
-                if vision_data_sports_ball: # Check if the tuple is not empty
-                    detected_ball_object = vision_data_sports_ball[0]
+            #elif not detected_ball_object: # Only check SPORTS_BALL if BALLCOLOR wasn't found
+            vision_data_sports_ball = robot.vision.get_data(SPORTS_BALL)
+            if vision_data_sports_ball: # Check if the tuple is not empty
+                detected_ball_object = vision_data_sports_ball[0]
 
             if detected_ball_object:           # We can still see the ball
                 if robot.has_sports_ball():                     # Do we have it?
