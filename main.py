@@ -146,7 +146,7 @@ def align_with_goal():
             print("Dropped the ball while aligning with goal!")
             return False
 
-        vision_data = robot.vision.get_data(BLUE_BARREL)
+        vision_data = robot.vision.get_data(ORANGE_BARREL)
         if vision_data and vision_data[0].exists:
             robot.turn_to(robot.inertial.get_heading() + vision_data[0].bearing)
             robot.stop_all_movement()
@@ -163,7 +163,7 @@ def align_with_goal():
 def approach_goal():
     """Moves the robot closer to the goal until a certain height threshold is met."""
     while True:
-        vision_data = robot.vision.get_data(BLUE_BARREL)
+        vision_data = robot.vision.get_data(ORANGE_BARREL)
         if vision_data and vision_data[0].exists:
             goal_height = vision_data[0].height
             if goal_height >= GOAL_HEIGHT_THRESHOLD:
