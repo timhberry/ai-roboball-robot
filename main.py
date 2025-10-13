@@ -116,10 +116,6 @@ def crashed_callback():
 robot.inertial.crashed(crashed_callback)
 robot.inertial.set_crash_sensitivity(NORMAL)
 
-# AI Vision Color detection for the ball
-BALLCOLOR = Colordesc(1, 206, 211, 138, 20, 0.3)
-robot.vision.color_description(BALLCOLOR)
-
 # Calibrate the robot and disable AprilTag sensing
 robot.inertial.calibrate()
 if robot.inertial.is_calibrating():
@@ -225,12 +221,6 @@ while True:
 
             detected_ball_object = None
 
-            # Prioritize detection by custom color signature (BALLCOLOR)
-            #vision_data_color = robot.vision.get_data(BALLCOLOR)
-            #if vision_data_color: # Check if the tuple is not empty
-            # If not found by color, check by pre-trained SPORTS_BALL object type
-            ##    detected_ball_object = vision_data_color[0]
-            #elif not detected_ball_object: # Only check SPORTS_BALL if BALLCOLOR wasn't found
             vision_data_sports_ball = robot.vision.get_data(SPORTS_BALL)
             if vision_data_sports_ball: # Check if the tuple is not empty
                 detected_ball_object = vision_data_sports_ball[0]
@@ -274,12 +264,7 @@ while True:
                 break
 
             detected_ball_object = None
-            # Prioritize detection by custom color signature (BALLCOLOR)
-            #vision_data_color = robot.vision.get_data(BALLCOLOR)
-            #if vision_data_color: # Check if the tuple is not empty
-            #    detected_ball_object = vision_data_color[0]
-            # If not found by color, check by pre-trained SPORTS_BALL object type
-            #elif not detected_ball_object: # Only check SPORTS_BALL if BALLCOLOR wasn't found
+
             vision_data_sports_ball = robot.vision.get_data(SPORTS_BALL)
             if vision_data_sports_ball: # Check if the tuple is not empty
                 detected_ball_object = vision_data_sports_ball[0]
