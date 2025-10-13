@@ -98,7 +98,7 @@ GOAL_HEIGHT_THRESHOLD = 30  # Minimum height of goal barrel to consider close en
 SCAN_MOVE_DURATION_SEC = 2
 SCAN_CYCLES_BEFORE_ACTION = 3
 APPROACH_MOVE_DURATION_MSEC = 20
-TURN_MOVE_DURATION_MSEC = 20
+TURN_MOVE_DURATION_MSEC = 100
 
 # Set the inital state for the robot
 crashed = False
