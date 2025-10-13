@@ -120,7 +120,7 @@ robot.inertial.set_crash_sensitivity(NORMAL)
 robot.inertial.calibrate()
 if robot.inertial.is_calibrating():
     print("Waiting for callibration to complete")
-    wait(2, SECONDS)
+    wait(1, SECONDS)
 
 
 def look_for_ball():
