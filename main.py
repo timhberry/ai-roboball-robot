@@ -3,6 +3,7 @@ from vex import *
 from vex_globals import *
 import math
 import random
+import time
 
 # Robot initialization for AIM platform
 robot = Robot()
@@ -98,7 +99,7 @@ GOAL_HEIGHT_THRESHOLD = 30  # Minimum height of goal barrel to consider close en
 SCAN_MOVE_DURATION_SEC = 2
 SCAN_CYCLES_BEFORE_ACTION = 3
 APPROACH_MOVE_DURATION_MSEC = 20
-TURN_MOVE_DURATION_MSEC = 100
+TURN_MOVE_DURATION_MSEC = 500
 
 # Set the inital state for the robot
 crashed = False
@@ -127,6 +128,7 @@ if robot.inertial.is_calibrating():
 
 
 def look_for_ball():
+    print(f"{time.time()}: look_for_ball() called")
     """Makes the robot rotate in place to scan for the ball."""
     robot.turn(RIGHT, SCAN_TURN_VELOCITY) # Or LEFT, or alternate directions for a more thorough scan
     wait(TURN_MOVE_DURATION_MSEC, MSEC) # Use a small duration for a quick turn
@@ -134,6 +136,7 @@ def look_for_ball():
 
 
 def align_with_goal():
+    print(f"{time.time()}: align_with_goal() called")
     """Turns the robot to face the opponent's goal barrel."""
     robot.set_turn_velocity(PRECISION_TURN_VELOCITY)
     robot.set_move_velocity(PRECISION_MOVE_VELOCITY)
@@ -161,6 +164,7 @@ def align_with_goal():
 
 
 def approach_goal():
+    print(f"{time.time()}: approach_goal() called")
     """Moves the robot closer to the goal until a certain height threshold is met."""
     while True:
         vision_data = robot.vision.get_data(ORANGE_BARREL)
@@ -178,6 +182,7 @@ def approach_goal():
 
 
 def execute_kick():
+    print(f"{time.time()}: execute_kick() called")
     """Performs the kicking action and celebratory animations."""
     robot.kicker.kick(MEDIUM)
     robot.screen.show_file(IMG_AMAZED, 0, 0)
@@ -198,8 +203,10 @@ def execute_kick():
 
 # Main loop
 while True:
+    print(f"{time.time()}: Entering main loop")
 
     if status == RobotStatus.FINDING_BALL:
+        print(f"{time.time()}: State is FINDING_BALL")
         # If we are finding the ball, we run the look_for_ball function in a thread
         # and stop when we see the ball in our AI Vision camera.
         # Since look_for_ball() is now non-blocking, we call it directly.
@@ -255,6 +262,7 @@ while True:
 
 
     elif status == RobotStatus.GETTING_BALL:
+        print(f"{time.time()}: State is GETTING_BALL")
         # If we've seen the ball, we now need to go get it!
 
         robot.screen.show_file(IMG_THRILLED, 0, 0)
@@ -296,6 +304,7 @@ while True:
 
 
     elif status == RobotStatus.FINDING_GOAL:
+        print(f"{time.time()}: State is FINDING_GOAL")
         # We've got the ball, now we need to find the goal and attempt to score
 
         robot.screen.show_file(IMG_DETERMINED, 0, 0)
@@ -319,6 +328,7 @@ while True:
 
 
     elif status == RobotStatus.CRASHED:
+        print(f"{time.time()}: State is CRASHED")
         # We crashed! We may have hit another robot, or the edge of the field
         # We'll try turning around to see if that helps
 
