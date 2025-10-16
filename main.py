@@ -116,6 +116,16 @@ def crashed_callback():
 robot.inertial.crashed(crashed_callback)
 robot.inertial.set_crash_sensitivity(NORMAL)
 
+# --- Color Signatures ---
+BALL_COLOR = Colordesc(1, 240, 255, 83, 10.0, 0.2)
+BLUEGOAL_COLOR = Colordesc(2, 86, 191, 227, 10.0, 0.2)
+ORANGEGOAL_COLOR = Colordesc(3, 233, 181, 94, 10.0, 0.2)
+
+# Register color signatures with the vision sensor
+robot.vision.color_description(BALL_COLOR)
+robot.vision.color_description(BLUEGOAL_COLOR)
+robot.vision.color_description(ORANGEGOAL_COLOR)
+
 # Calibrate the robot and disable AprilTag sensing
 robot.inertial.calibrate()
 if robot.inertial.is_calibrating():
@@ -145,8 +155,12 @@ def align_with_goal():
             print("Dropped the ball while aligning with goal!")
             return False
 
-        vision_data = robot.vision.get_data(ORANGE_BARREL)
-        if vision_data and vision_data[0].exists:
+        vision_data_orange_barrel = robot.vision.get_data(ORANGE_BARREL)
+        vision_data_orange_color = robot.vision.get_data(ORANGEGOAL_COLOR)
+
+        vision_data = vision_data_orange_barrel if vision_data_orange_barrel else vision_data_orange_color
+
+        if vision_data:
             robot.turn_to(robot.inertial.get_heading() + vision_data[0].bearing)
             robot.stop_all_movement()
             return True
@@ -162,8 +176,12 @@ def align_with_goal():
 def approach_goal():
     print(f"{time.time()}: approach_goal() called")
     """Moves the robot closer to the goal until a certain height threshold is met."""
-    while True:
-        vision_data = robot.vision.get_data(ORANGE_BARREL)
+    while True: 
+        vision_data_orange_barrel = robot.vision.get_data(ORANGE_BARREL)
+        vision_data_orange_color = robot.vision.get_data(ORANGEGOAL_COLOR)
+
+        vision_data = vision_data_orange_barrel if vision_data_orange_barrel else vision_data_orange_color
+
         if vision_data and vision_data[0].exists:
             goal_height = vision_data[0].height
             if goal_height >= GOAL_HEIGHT_THRESHOLD:
@@ -221,11 +239,12 @@ while True:
 
             detected_ball_object = None
 
+            # Check for sports ball object OR ball color
             vision_data_sports_ball = robot.vision.get_data(SPORTS_BALL)
-            if vision_data_sports_ball: # Check if the tuple is not empty
-                detected_ball_object = vision_data_sports_ball[0]
+            vision_data_ball_color = robot.vision.get_data(BALL_COLOR)
 
-            if detected_ball_object:
+            if vision_data_sports_ball or vision_data_ball_color:
+                detected_ball_object = (vision_data_sports_ball or vision_data_ball_color)[0]
                 robot.turn_to(robot.inertial.get_heading() + detected_ball_object.bearing)
                 status = RobotStatus.GETTING_BALL
                 ball_found = True
@@ -265,11 +284,12 @@ while True:
 
             detected_ball_object = None
 
+            # Check for sports ball object OR ball color
             vision_data_sports_ball = robot.vision.get_data(SPORTS_BALL)
-            if vision_data_sports_ball: # Check if the tuple is not empty
-                detected_ball_object = vision_data_sports_ball[0]
+            vision_data_ball_color = robot.vision.get_data(BALL_COLOR)
 
-            if detected_ball_object:           # We can still see the ball
+            if vision_data_sports_ball or vision_data_ball_color:
+                detected_ball_object = (vision_data_sports_ball or vision_data_ball_color)[0]
                 if robot.has_sports_ball():                     # Do we have it?
                     robot.stop_all_movement()                   # If so, break the While loop
                     ball_acquired = True

@@ -89,11 +89,13 @@ if [ "$ARGUMENT" == "orange" ]; then
         # which makes it compatible with both GNU sed (Linux) and BSD sed (macOS) for in-place editing
         # without creating a backup file.
         # 's/old_string/new_string/' is the substitution command.
-        sed -i '' '148s/ORANGE_BARREL/BLUE_BARREL/' main.py
-        sed -i '' '166s/ORANGE_BARREL/BLUE_BARREL/' main.py
+        sed -i '' '158s/ORANGE_BARREL/BLUE_BARREL/' main.py
+        sed -i '' '159s/ORANGEGOAL_COLOR/BLUEGOAL_COLOR/' main.py
+        sed -i '' '180s/ORANGE_BARREL/BLUE_BARREL/' main.py
+        sed -i '' '181s/ORANGEGOAL_COLOR/BLUEGOAL_COLOR/' main.py
         
         if [ $? -eq 0 ]; then
-            echo "Successfully replaced 'ORANGE_BARREL' with 'BLUE_BARREL' in main.py."
+            echo "Successfully replaced orange objects with blue objects in main.py."
         else
             echo "Error: Failed to modify main.py. 'sed' command might have encountered an issue."
         fi
