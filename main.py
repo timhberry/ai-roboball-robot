@@ -88,18 +88,17 @@ class RobotStatus:
     CRASHED = "crashed"
 
 # Movement Constants
-DEFAULT_SPEED = 50
-PRECISION_MOVE_VELOCITY = 25
+DEFAULT_SPEED = 50           # Default speed
+PRECISION_MOVE_VELOCITY = 25 # Used for moving with more precision
 PRECISION_TURN_VELOCITY = 20 # Used for aligning with goal
-SCAN_TURN_VELOCITY = 20      # New constant for ball scanning turns
+SCAN_TURN_VELOCITY = 20      # Velocity of turn when scanning for ball
 SCAN_RANDOM_MOVE_MM = 20     # Distance to move after a full scan
 
 # Vision and Behavior Constants
-GOAL_HEIGHT_THRESHOLD = 30  # Minimum height of goal barrel to consider close enough
-SCAN_MOVE_DURATION_SEC = 2
-SCAN_CYCLES_BEFORE_ACTION = 3
-APPROACH_MOVE_DURATION_MSEC = 20
-TURN_MOVE_DURATION_MSEC = 500
+GOAL_HEIGHT_THRESHOLD = 30       # Minimum height of goal barrel to consider close enough
+SCAN_MOVE_DURATION_SEC = 2       # Time to wait before stopping a scanning turn
+APPROACH_MOVE_DURATION_MSEC = 20 # Time to wait before stopping an approach move
+TURN_MOVE_DURATION_MSEC = 500    # Time to wait before stopping a turn move
 
 # Set the inital state for the robot
 crashed = False
@@ -136,9 +135,9 @@ if robot.inertial.is_calibrating():
 def look_for_ball():
     print(f"{time.time()}: look_for_ball() called")
     """Makes the robot rotate in place to scan for the ball."""
-    robot.turn(RIGHT, SCAN_TURN_VELOCITY) # Or LEFT, or alternate directions for a more thorough scan
-    wait(TURN_MOVE_DURATION_MSEC, MSEC) # Use a small duration for a quick turn
-    robot.stop_all_movement() # Stop after the turn
+    robot.turn(RIGHT, SCAN_TURN_VELOCITY) # Turn the robot to look for the ball
+    wait(TURN_MOVE_DURATION_MSEC, MSEC)   # Wait before stopping the turn move
+    robot.stop_all_movement()             # Stop after the turn
 
 
 def align_with_goal():
@@ -223,7 +222,6 @@ while True:
         print(f"{time.time()}: State is FINDING_BALL")
         # If we are finding the ball, we run the look_for_ball function in a thread
         # and stop when we see the ball in our AI Vision camera.
-        # Since look_for_ball() is now non-blocking, we call it directly.
 
         robot.screen.show_file(IMG_THINKING, 0, 0)
 
@@ -235,7 +233,7 @@ while True:
             if crashed:
                 status = RobotStatus.CRASHED
                 break
-            look_for_ball() # Perform a small turn to scan
+            look_for_ball()
 
             detected_ball_object = None
 
