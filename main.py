@@ -122,8 +122,6 @@ ORANGEGOAL_COLOR = Colordesc(3, 233, 181, 94, 10.0, 0.2)
 
 # Register color signatures with the vision sensor
 robot.vision.color_description(BALL_COLOR)
-robot.vision.color_description(BLUEGOAL_COLOR)
-robot.vision.color_description(ORANGEGOAL_COLOR)
 
 # Calibrate the robot and disable AprilTag sensing
 robot.inertial.calibrate()
@@ -154,10 +152,7 @@ def align_with_goal():
             print("Dropped the ball while aligning with goal!")
             return False
 
-        vision_data_orange_barrel = robot.vision.get_data(ORANGE_BARREL)
-        vision_data_orange_color = robot.vision.get_data(ORANGEGOAL_COLOR)
-
-        vision_data = vision_data_orange_barrel if vision_data_orange_barrel else vision_data_orange_color
+        vision_data = robot.vision.get_data(ORANGE_BARREL)
 
         if vision_data:
             robot.turn_to(robot.inertial.get_heading() + vision_data[0].bearing)
@@ -176,10 +171,7 @@ def approach_goal():
     print(f"{time.time()}: approach_goal() called")
     """Moves the robot closer to the goal until a certain height threshold is met."""
     while True: 
-        vision_data_orange_barrel = robot.vision.get_data(ORANGE_BARREL)
-        vision_data_orange_color = robot.vision.get_data(ORANGEGOAL_COLOR)
-
-        vision_data = vision_data_orange_barrel if vision_data_orange_barrel else vision_data_orange_color
+        vision_data = robot.vision.get_data(ORANGE_BARREL)
 
         if vision_data and vision_data[0].exists:
             goal_height = vision_data[0].height
