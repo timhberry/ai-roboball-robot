@@ -116,7 +116,7 @@ robot.inertial.crashed(crashed_callback)
 robot.inertial.set_crash_sensitivity(NORMAL)
 
 # --- Color Signatures ---
-BALL_COLOR = Colordesc(1, 245, 255, 65, 10.0, 0.3)
+BALL_COLOR = Colordesc(1, 236, 237, 88, 10.0, 0.3)
 
 # Register color signatures with the vision sensor
 robot.vision.color_description(BALL_COLOR)
