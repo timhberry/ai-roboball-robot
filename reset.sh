@@ -3,6 +3,11 @@
 # reset.sh
 # This script helps reset the current Git working directory and optionally modifies main.py.
 
+# Ball signature colours - change these if you're calibrating to different lighting
+BALL_R=236
+BALL_G=237
+BALL_B=88
+
 # Check if exactly one argument is provided
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 [blue|orange]"
@@ -57,5 +62,8 @@ else
     echo "Usage: $0 [blue|orange]"
     exit 1
 fi
+
+echo "Updating ball signature colours."
+sed -i '' "119s/Colordesc([^,]*, [^,]*, [^,]*, [^,]*/Colordesc(1, $BALL_R, $BALL_G, $BALL_B/" main.py
 
 echo "Script execution finished."
