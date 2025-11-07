@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # reset.sh
-# This script helps reset the current Git working directory and optionally modifies main.py.
+# This script resets the robot starter code in main.py, sets the ball colour signature and updates the target barrel colour
 
 # Ball signature colours - change these if you're calibrating to different lighting
 BALL_R=236
@@ -11,24 +11,21 @@ BALL_B=88
 # Check if exactly one argument is provided
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 [blue|orange]"
-    echo "  blue: Resets the Git working directory."
-    echo "  orange: Resets the Git working directory AND replaces 'ORANGE_BARREL' with 'BLUE_BARREL' in main.py."
+    echo "  blue: Resets the robot starter code (main.py)"
+    echo "  orange: Resets the robot starter code (main.py) AND replaces 'ORANGE_BARREL' with 'BLUE_BARREL'."
     exit 1
 fi
 
 ARGUMENT=$1
 
-echo "Attempting to reset Git working directory to match the remote repository..."
+echo "Attempting to reset main.py..."
 
-# Reset the current branch to the HEAD of the upstream remote, discarding local changes.
-# 'git reset --hard HEAD' discards changes in the working directory and staging area.
-# 'git clean -fd' removes untracked files and directories.
-git reset --hard HEAD && git clean -fd
+git checkout HEAD -- main.py
 
 if [ $? -eq 0 ]; then
-    echo "Git working directory reset successfully."
+    echo "main.py reset successfully."
 else
-    echo "Error: Failed to reset Git working directory. Please check your Git status."
+    echo "Error: Failed to reset main.py. Please check your Git status."
     exit 1
 fi
 
@@ -38,12 +35,7 @@ if [ "$ARGUMENT" == "orange" ]; then
 
     # Check if main.py exists
     if [ -f "main.py" ]; then
-        # Use sed to replace "ORANGE_BARREL" with "BLUE_BARREL" on lines 159 and 175.
-        # The -i option edits the file in place. On macOS (BSD sed), -i requires an argument
-        # for the backup file extension (e.g., -i.bak). Using -i '' provides an empty extension,
-        # which makes it compatible with both GNU sed (Linux) and BSD sed (macOS) for in-place editing
-        # without creating a backup file.
-        # 's/old_string/new_string/' is the substitution command.
+
         sed -i '' '153s/ORANGE_BARREL/BLUE_BARREL/' main.py
         sed -i '' '172s/ORANGE_BARREL/BLUE_BARREL/' main.py
 
